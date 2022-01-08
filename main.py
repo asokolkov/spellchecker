@@ -9,12 +9,10 @@ from menu import open_settings
 
 
 def prepare_execution():
-    global wrong_words
-    global word_coords
     top_btn.value = ""
     bot_btn.value = ""
-    word_coords = ()
-    wrong_words = {}
+    words.coords = ()
+    words.wrong = {}
     main_text.tag_remove("wrong", "1.0", tk.END)
 
 
@@ -31,7 +29,7 @@ def highlight_wrong_words():
             if first != j and second != j:
                 start, finish = get_coords(j, text)
                 main_text.tag_add("wrong", start, finish)
-                wrong_words[f"{j}"] = {
+                words.wrong[f"{j}"] = {
                     "replacements": (first, second),
                     "indexes": (start, finish)
                 }
@@ -39,23 +37,22 @@ def highlight_wrong_words():
 
 
 def on_word_click(event):
-    global word_coords
     word = main_text.get(f"@{event.x},{event.y} wordstart",
                          f"@{event.x},{event.y} wordend").lower()
-    if word in wrong_words:
+    if word in words.wrong:
         is_beginning = sentence_beginning(
             main_text, main_text.index(f"@{event.x},{event.y} wordstart"))
         if is_beginning:
-            top_btn.value = wrong_words[word]["replacements"][0].capitalize()
+            top_btn.value = words.wrong[word]["replacements"][0].capitalize()
         else:
-            top_btn.value = wrong_words[word]["replacements"][0]
+            top_btn.value = words.wrong[word]["replacements"][0]
         if is_beginning:
-            bot_btn.value = wrong_words[word]["replacements"][1].capitalize()
+            bot_btn.value = words.wrong[word]["replacements"][1].capitalize()
         else:
-            bot_btn.value = wrong_words[word]["replacements"][1]
+            bot_btn.value = words.wrong[word]["replacements"][1]
         top_btn.element["text"] = check_word_len(top_btn.value)
         bot_btn.element["text"] = check_word_len(bot_btn.value)
-        word_coords = (event.x, event.y)
+        words.coords = (event.x, event.y)
 
 
 def replace_word(button_value):
@@ -65,9 +62,9 @@ def replace_word(button_value):
         top_btn.element["text"] = ""
         bot_btn.element["text"] = ""
         start = main_text.index(
-            f"@{word_coords[0]},{word_coords[1]} wordstart")
+            f"@{words.coords[0]},{words.coords[1]} wordstart")
         finish = main_text.index(
-            f"@{word_coords[0]},{word_coords[1]} wordend")
+            f"@{words.coords[0]},{words.coords[1]} wordend")
         main_text.delete(start, finish)
         main_text.insert(start, button_value)
 
@@ -76,14 +73,16 @@ def on_mouse_move(event):
     main_text.tag_remove("highlight", "1.0", tk.END)
     word = main_text.get(f"@{event.x},{event.y} wordstart",
                          f"@{event.x},{event.y} wordend")
-    if word.lower() in wrong_words:
+    if word.lower() in words.wrong:
         main_text.tag_add("highlight",
                           f"@{event.x},{event.y} wordstart",
                           f"@{event.x},{event.y} wordend")
 
 
-wrong_words = {}
-word_coords = (0, 0)
+@dataclass
+class Words:
+    wrong: dict
+    coords: tuple
 
 
 @dataclass
@@ -98,6 +97,8 @@ if __name__ == "__main__":
     words_dictionary = read_file(filename)
     if words_dictionary is None:
         raise ValueError("dictionary.txt file is empty.")
+
+    words = Words({}, (0, 0))
 
     root = tk.Tk()
     root.title("Spellchecker")
@@ -131,7 +132,7 @@ if __name__ == "__main__":
     root.config(menu=main_menu)
     main_menu.add_command(label="Save words",
                           command=lambda: append_file(
-                              filename, wrong_words.keys()))
+                              filename, words.wrong.keys()))
     main_menu.add_command(label="Settings",
                           command=lambda: open_settings(root))
 
