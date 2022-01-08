@@ -1,16 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
+import tkinter.font as tkf
 from files import file_to_dict, dict_to_file
 
-font = ("Helvetica", 15)
+
 length = 5
 sides = tk.N + tk.S + tk.W + tk.E
-
-
-def print_help(main_text):
-    info = "help info"
-    main_text.delete("1.0", tk.END)
-    main_text.insert("1.0", info)
 
 
 def clear_field(event):
@@ -30,8 +25,10 @@ def open_settings(root):
     settings.title("Spellchecker Settings")
     settings.resizable(width=False, height=False)
 
+    font = tkf.Font(size=30)
+
     settings_l = tk.Label(settings, text="Settings",
-                          font=("Helvetica", 20, "bold"), anchor=tk.W)
+                          font=tkf.Font(size=30, weight='bold'), anchor=tk.W)
     dict_path_l = tk.Label(settings, text="Dictionary Name", font=font,
                            anchor=tk.W)
     dict_name_e = tk.Entry(settings, font=font)

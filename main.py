@@ -1,9 +1,10 @@
 import re
 import tkinter as tk
+import tkinter.font as tkf
 from calculations import get_best_replacement, simplify_text, get_coords, \
     check_word_len, sentence_beginning, sort_dictionary
 from files import read_file, file_to_dict, append_file
-from menu import open_settings, print_help
+from menu import open_settings
 
 
 def prepare_execution():
@@ -92,14 +93,15 @@ if __name__ == "__main__":
     sorted_dictionary = read_file(filename)
     if sorted_dictionary is None:
         raise ValueError("dictionary.txt file is empty.")
-    main_font = ("Helvetica", 30)
-    main_font_buttons = ("Helvetica", 30, "bold")
     sides = tk.N + tk.S + tk.W + tk.E
     method = main_data["method"]
 
     root = tk.Tk()
     root.resizable(width=False, height=False)
     root.title("Spellchecker")
+
+    main_font = tkf.Font(size=30)
+    main_font_buttons = tkf.Font(size=30, weight='bold')
 
     main_text = tk.Text(root, font=main_font, foreground="#001219",
                         background="#e9d8a6", width=40, height=8)
@@ -132,6 +134,5 @@ if __name__ == "__main__":
                           command=lambda: sort_dictionary(filename))
     main_menu.add_command(label="Settings",
                           command=lambda: open_settings(root))
-    main_menu.add_command(label="Help", command=lambda: print_help(main_text))
 
     root.mainloop()
