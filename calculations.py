@@ -36,7 +36,7 @@ def get_best_word(word, sorted_dictionary, method, except_word=None):
     return best_word
 
 
-def simplify_text(text):
+def text_to_array(text):
     result = []
     for i in text.split():
         if not i.isdigit() and (bool(re.search("[а-яА-Я]", i))
@@ -57,12 +57,10 @@ def get_coords(word, text):
     return f"{row + 1}.{start}", f"{row + 1}.{finish}"
 
 
-def sentence_beginning(main_text, start):
+def check_beginning(main_text, start):
     start_row, start_column = start.split(".")
     text = main_text.get(1.0, tk.END).split("\n")
     row = text[int(start_row) - 1]
     index = int(start_column) - 2
-    return True if index < 0 or \
-                   row[index] == "." or \
-                   row[index] == "!" or \
-                   row[index] == "?" else False
+    return True if index < 0 or row[index] == "." or \
+                   row[index] == "!" or row[index] == "?" else False

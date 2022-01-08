@@ -1,9 +1,10 @@
 import tkinter as tk
 import tkinter.font as tkf
-from dataclasses import dataclass
-from calculations import get_best_word, simplify_text, get_coords, sentence_beginning
-from files import read_file, file_to_dict, append_file
 from menu import open_settings
+from dataclasses import dataclass
+from files import read_file, file_to_dict, append_file
+from calculations import get_best_word, text_to_array, get_coords, \
+    check_beginning
 
 
 def highlight_wrong_words():
@@ -11,7 +12,7 @@ def highlight_wrong_words():
     words.wrong = []
     text.tag_remove("wrong", "1.0", tk.END)
     local_text = text.get(1.0, tk.END).lower()
-    for i in simplify_text(local_text):
+    for i in text_to_array(local_text):
         if get_best_word(i, dictionary, main_data["method"]) != i:
             start, finish = get_coords(i, local_text)
             text.tag_add("wrong", start, finish)
@@ -21,9 +22,9 @@ def highlight_wrong_words():
 
 def on_word_click(event):
     word = text.get(f"@{event.x},{event.y} wordstart",
-                         f"@{event.x},{event.y} wordend").lower()
+                    f"@{event.x},{event.y} wordend").lower()
     if word in words.wrong:
-        is_beginning = sentence_beginning(
+        is_beginning = check_beginning(
             text, text.index(f"@{event.x},{event.y} wordstart"))
         first = get_best_word(word, dictionary, main_data["method"])
         second = get_best_word(word, dictionary, main_data["method"], first)
@@ -34,10 +35,8 @@ def on_word_click(event):
 
 def replace_word(button):
     if button["text"] != "":
-        start = text.index(
-            f"@{words.coords[0]},{words.coords[1]} wordstart")
-        finish = text.index(
-            f"@{words.coords[0]},{words.coords[1]} wordend")
+        start = text.index(f"@{words.coords[0]},{words.coords[1]} wordstart")
+        finish = text.index(f"@{words.coords[0]},{words.coords[1]} wordend")
         text.delete(start, finish)
         text.insert(start, button["text"])
         top_btn["text"] = ""
@@ -47,11 +46,10 @@ def replace_word(button):
 def on_mouse_move(event):
     text.tag_remove("highlight", "1.0", tk.END)
     word = text.get(f"@{event.x},{event.y} wordstart",
-                         f"@{event.x},{event.y} wordend")
+                    f"@{event.x},{event.y} wordend")
     if word.lower() in words.wrong:
-        text.tag_add("highlight",
-                          f"@{event.x},{event.y} wordstart",
-                          f"@{event.x},{event.y} wordend")
+        text.tag_add("highlight", f"@{event.x},{event.y} wordstart",
+                     f"@{event.x},{event.y} wordend")
 
 
 @dataclass
@@ -75,11 +73,11 @@ if __name__ == "__main__":
     main_font = tkf.Font(size=30)
     btn_font = tkf.Font(size=30, weight='bold')
 
-    text = tk.Text(root, font=main_font, foreground="#001219", 
-                        width=40, height=6)
+    text = tk.Text(root, font=main_font, foreground="#001219",
+                   width=40, height=6)
     top_btn = tk.Button(font=btn_font, command=lambda: replace_word(top_btn))
     bot_btn = tk.Button(font=btn_font, command=lambda: replace_word(bot_btn))
-    ready_btn = tk.Button(text="Ready", font=btn_font, 
+    ready_btn = tk.Button(text="Ready", font=btn_font,
                           command=highlight_wrong_words)
 
     text.pack()
@@ -96,8 +94,7 @@ if __name__ == "__main__":
     main_menu = tk.Menu(root)
     root.config(menu=main_menu)
     main_menu.add_command(label="Save words",
-                          command=lambda: append_file(
-                              filename, words.wrong))
+                          command=lambda: append_file(filename, words.wrong))
     main_menu.add_command(label="Settings",
                           command=lambda: open_settings(root))
 
