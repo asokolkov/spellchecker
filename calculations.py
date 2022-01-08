@@ -21,7 +21,7 @@ def distance(a, b):
     return current_row[n]
 
 
-def get_best_replacement(word, sorted_dictionary, method, except_word=None):
+def get_best_word(word, sorted_dictionary, method, except_word=None):
     local_dictionary = sorted_dictionary.copy()
     if except_word is not None:
         local_dictionary.remove(except_word)
@@ -55,11 +55,6 @@ def get_coords(word, text):
     start = text_array[row].index(word)
     finish = start + len(word)
     return f"{row + 1}.{start}", f"{row + 1}.{finish}"
-
-
-def check_word_len(word):
-    max_word_len = 16
-    return word[:max_word_len] + "..." if len(word) > max_word_len else word
 
 
 def sentence_beginning(main_text, start):

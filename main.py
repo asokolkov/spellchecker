@@ -1,138 +1,103 @@
-import re
 import tkinter as tk
 import tkinter.font as tkf
 from dataclasses import dataclass
-from calculations import get_best_replacement, simplify_text, get_coords, \
-    check_word_len, sentence_beginning
+from calculations import get_best_word, simplify_text, get_coords, sentence_beginning
 from files import read_file, file_to_dict, append_file
 from menu import open_settings
 
 
-def prepare_execution():
-    top_btn.value = ""
-    bot_btn.value = ""
-    words.coords = ()
-    words.wrong = {}
-    main_text.tag_remove("wrong", "1.0", tk.END)
-
-
 def highlight_wrong_words():
-    prepare_execution()
-    text = main_text.get(1.0, tk.END).lower()
-    simplified_text = simplify_text(text)
-    for i in simplified_text:
-        for j in re.split(r"[!#$%&'()\"*+,-./:;<=>?@[\]^_`{|}~]", i):
-            first = get_best_replacement(j, words_dictionary, 
-                                         main_data["method"])
-            second = get_best_replacement(j, words_dictionary, 
-                                          main_data["method"], first)
-            if first != j and second != j:
-                start, finish = get_coords(j, text)
-                main_text.tag_add("wrong", start, finish)
-                words.wrong[f"{j}"] = {
-                    "replacements": (first, second),
-                    "indexes": (start, finish)
-                }
-            text = text.replace(j, "#" * len(j), 1)
+    words.coords = ()
+    words.wrong = []
+    text.tag_remove("wrong", "1.0", tk.END)
+    local_text = text.get(1.0, tk.END).lower()
+    for i in simplify_text(local_text):
+        if get_best_word(i, dictionary, main_data["method"]) != i:
+            start, finish = get_coords(i, local_text)
+            text.tag_add("wrong", start, finish)
+            words.wrong.append(i)
+        local_text = local_text.replace(i, "#" * len(i), 1)
 
 
 def on_word_click(event):
-    word = main_text.get(f"@{event.x},{event.y} wordstart",
+    word = text.get(f"@{event.x},{event.y} wordstart",
                          f"@{event.x},{event.y} wordend").lower()
     if word in words.wrong:
         is_beginning = sentence_beginning(
-            main_text, main_text.index(f"@{event.x},{event.y} wordstart"))
-        if is_beginning:
-            top_btn.value = words.wrong[word]["replacements"][0].capitalize()
-        else:
-            top_btn.value = words.wrong[word]["replacements"][0]
-        if is_beginning:
-            bot_btn.value = words.wrong[word]["replacements"][1].capitalize()
-        else:
-            bot_btn.value = words.wrong[word]["replacements"][1]
-        top_btn.element["text"] = check_word_len(top_btn.value)
-        bot_btn.element["text"] = check_word_len(bot_btn.value)
+            text, text.index(f"@{event.x},{event.y} wordstart"))
+        first = get_best_word(word, dictionary, main_data["method"])
+        second = get_best_word(word, dictionary, main_data["method"], first)
+        top_btn["text"] = first.capitalize() if is_beginning else first
+        bot_btn["text"] = second.capitalize() if is_beginning else second
         words.coords = (event.x, event.y)
 
 
-def replace_word(button_value):
-    if button_value != "":
-        top_btn.value = ""
-        bot_btn.value = ""
-        top_btn.element["text"] = ""
-        bot_btn.element["text"] = ""
-        start = main_text.index(
+def replace_word(button):
+    if button["text"] != "":
+        start = text.index(
             f"@{words.coords[0]},{words.coords[1]} wordstart")
-        finish = main_text.index(
+        finish = text.index(
             f"@{words.coords[0]},{words.coords[1]} wordend")
-        main_text.delete(start, finish)
-        main_text.insert(start, button_value)
+        text.delete(start, finish)
+        text.insert(start, button["text"])
+        top_btn["text"] = ""
+        bot_btn["text"] = ""
 
 
 def on_mouse_move(event):
-    main_text.tag_remove("highlight", "1.0", tk.END)
-    word = main_text.get(f"@{event.x},{event.y} wordstart",
+    text.tag_remove("highlight", "1.0", tk.END)
+    word = text.get(f"@{event.x},{event.y} wordstart",
                          f"@{event.x},{event.y} wordend")
     if word.lower() in words.wrong:
-        main_text.tag_add("highlight",
+        text.tag_add("highlight",
                           f"@{event.x},{event.y} wordstart",
                           f"@{event.x},{event.y} wordend")
 
 
 @dataclass
 class Words:
-    wrong: dict
+    wrong: list
     coords: tuple
-
-
-@dataclass
-class MyButton:
-    value: str
-    element: tk.Button
 
 
 if __name__ == "__main__":
     main_data = file_to_dict()
     filename = main_data["dict_name"]
-    words_dictionary = read_file(filename)
-    if words_dictionary is None:
+    dictionary = read_file(filename)
+    if dictionary is None:
         raise ValueError("dictionary.txt file is empty.")
 
-    words = Words({}, (0, 0))
+    words = Words([], (0, 0))
 
     root = tk.Tk()
     root.title("Spellchecker")
 
     main_font = tkf.Font(size=30)
-    main_font_buttons = tkf.Font(size=30, weight='bold')
+    btn_font = tkf.Font(size=30, weight='bold')
 
-    main_text = tk.Text(root, font=main_font, foreground="#001219", 
+    text = tk.Text(root, font=main_font, foreground="#001219", 
                         width=40, height=6)
-    top_btn = MyButton(
-        "", tk.Button(font=main_font_buttons,
-                      command=lambda: replace_word(top_btn.value)))
-    bot_btn = MyButton(
-        "", tk.Button(font=main_font_buttons, 
-                      command=lambda: replace_word(bot_btn.value)))
-    ready_btn = tk.Button(text="Ready", font=main_font_buttons, 
+    top_btn = tk.Button(font=btn_font, command=lambda: replace_word(top_btn))
+    bot_btn = tk.Button(font=btn_font, command=lambda: replace_word(bot_btn))
+    ready_btn = tk.Button(text="Ready", font=btn_font, 
                           command=highlight_wrong_words)
 
-    main_text.pack()
-    top_btn.element.pack()
-    bot_btn.element.pack()
+    text.pack()
+    top_btn.pack()
+    bot_btn.pack()
     ready_btn.pack()
 
-    main_text.tag_config("highlight", background="#94d2bd")
-    main_text.tag_configure("wrong", foreground="#ae2012")
+    text.tag_config("highlight", background="#94d2bd")
+    text.tag_configure("wrong", foreground="#ae2012")
 
-    main_text.bind("<Motion>", on_mouse_move)
-    main_text.bind("<Button>", on_word_click)
+    text.bind("<Motion>", on_mouse_move)
+    text.bind("<Button>", on_word_click)
 
     main_menu = tk.Menu(root)
     root.config(menu=main_menu)
     main_menu.add_command(label="Save words",
                           command=lambda: append_file(
-                              filename, words.wrong.keys()))
+                              filename, words.wrong))
     main_menu.add_command(label="Settings",
                           command=lambda: open_settings(root))
 
