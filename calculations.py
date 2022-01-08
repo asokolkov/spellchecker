@@ -1,9 +1,6 @@
 import re
-
 import Levenshtein
 import tkinter as tk
-
-from files import read_file, append_file
 
 
 def distance(a, b):
@@ -63,12 +60,6 @@ def get_coords(word, text):
 def check_word_len(word):
     max_word_len = 16
     return word[:max_word_len] + "..." if len(word) > max_word_len else word
-
-
-def sort_dictionary(filename):
-    sorted_dictionary_to_save = sorted(read_file(filename), key=len)[::-1]
-    open(filename, "w").close()
-    append_file(filename, sorted_dictionary_to_save)
 
 
 def sentence_beginning(main_text, start):

@@ -2,7 +2,7 @@ import re
 import tkinter as tk
 import tkinter.font as tkf
 from calculations import get_best_replacement, simplify_text, get_coords, \
-    check_word_len, sentence_beginning, sort_dictionary
+    check_word_len, sentence_beginning
 from files import read_file, file_to_dict, append_file
 from menu import open_settings
 
@@ -130,8 +130,6 @@ if __name__ == "__main__":
     main_menu.add_command(label="Save words",
                           command=lambda: append_file(
                               filename, wrong_words.keys()))
-    main_menu.add_command(label="Sort dictionary",
-                          command=lambda: sort_dictionary(filename))
     main_menu.add_command(label="Settings",
                           command=lambda: open_settings(root))
 
