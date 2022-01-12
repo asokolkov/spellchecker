@@ -48,13 +48,3 @@ class TestCalculations(unittest.TestCase):
         self.assertEqual(Levenshtein.distance(strings[1][0], strings[1][1]), 6)
         self.assertEqual(Levenshtein.distance(strings[2][0], strings[2][1]),
                          11)
-
-    def test_simplify(self):
-        self.assertEqual(simplify_text(texts[0]), text_results[0])
-        self.assertEqual(simplify_text(texts[1]), text_results[1])
-        self.assertEqual(simplify_text(texts[2]), text_results[2])
-
-    def test_check_max_length(self):
-        self.assertEqual(check_word_len("First"), "First")
-        self.assertEqual(check_word_len("Super-Extra-Second"),
-                         "Super-Extra-Seco...")

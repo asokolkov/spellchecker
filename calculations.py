@@ -1,6 +1,5 @@
 import re
 import Levenshtein
-import tkinter as tk
 
 
 def distance(a, b):
@@ -36,11 +35,44 @@ def get_best_word(word, sorted_dictionary, method, except_word=None):
     return best_word
 
 
+def compress_coords(start, finish):
+    a = start.split(".")
+    b = finish.split(".")
+    return f"{a[0]}.{int(a[1]) + 1}", f"{b[0]}.{int(b[1]) - 1}"
+
+
+def get_clicked_word(x, y, text):
+    result = ""
+    clicked_coords = text.index(f"@{x},{y}"), text.index("current")
+    text_coords = clicked_coords[0].split(".")
+    row, col = int(text_coords[0]), int(text_coords[1])
+
+    finish = f"{row}.{col + 1}"
+    letter = text.get(f"{row}.{col}", finish)
+    i = 1
+    while letter.isalpha() or letter == "-":
+        result += letter
+        i += 1
+        finish = f"{row}.{col + i}"
+        letter = text.get(f"{row}.{col + i - 1}", finish)
+
+    i = 1
+    start = f"{row}.{col - 1}"
+    letter = text.get(start, f"{row}.{col}")
+    while letter.isalpha() or letter == "-":
+        result = letter + result
+        i += 1
+        start = f"{row}.{col - i}"
+        letter = text.get(start, f"{row}.{col - i + 1}")
+
+    return result, compress_coords(start, finish)
+
+
 def text_to_array(text):
     result = []
     for i in text.split():
-        if not i.isdigit() and (bool(re.search("[а-яА-Я]", i))
-                                or bool(re.search("[a-zA-Z]", i))):
+        if not i.isdigit() and (bool(re.search("[а-яА-Я-]", i))
+                                or bool(re.search("[a-zA-Z-]", i))):
             result.append(i)
     return result
 
@@ -55,12 +87,3 @@ def get_coords(word, text):
     start = text_array[row].index(word)
     finish = start + len(word)
     return f"{row + 1}.{start}", f"{row + 1}.{finish}"
-
-
-def check_beginning(main_text, start):
-    start_row, start_column = start.split(".")
-    text = main_text.get(1.0, tk.END).split("\n")
-    row = text[int(start_row) - 1]
-    index = int(start_column) - 2
-    return True if index < 0 or row[index] == "." or \
-                   row[index] == "!" or row[index] == "?" else False
