@@ -48,3 +48,20 @@ class TestCalculations(unittest.TestCase):
         self.assertEqual(Levenshtein.distance(strings[1][0], strings[1][1]), 6)
         self.assertEqual(Levenshtein.distance(strings[2][0], strings[2][1]),
                          11)
+
+    def test_get_coords(self):
+        self.assertEqual(get_coords("консультация", texts[1]),
+                         ('1.15', '1.27'))
+        self.assertEqual(get_coords("Идейные", texts[1]), ('2.0', '2.7'))
+        self.assertEqual(get_coords("", texts[1]), ('1.0', '1.0'))
+
+    def test_compress_coords(self):
+        self.assertEqual(compress_coords("1.1", "1.6"), ('1.2', '1.5'))
+        self.assertEqual(compress_coords("1.1", "2.4"), ('1.2', '2.3'))
+
+    def test_text_to_array(self):
+        self.assertEqual(
+            text_to_array(
+                "1;ob234b 1ou3b4njo \n g-345t -g3w45 q34x,1.34"),
+            ['1;ob234b', '1ou3b4njo', 'g-345t', '-g3w45', 'q34x,1.34'])
+        self.assertEqual(text_to_array(""), [])

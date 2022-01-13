@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 import tkinter.font as tkf
 from menu import open_settings
@@ -58,8 +59,10 @@ if __name__ == "__main__":
     main_data = file_to_dict()
     filename = main_data["dict_name"]
     correct_words = read_file(filename)
-    if correct_words is None:
-        raise ValueError("correct_words.txt file is empty.")
+
+    if not correct_words:
+        print("dictionary.txt file is empty.")
+        sys.exit(1)
 
     words = Words([], (0, 0))
 
