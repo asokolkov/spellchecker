@@ -1,5 +1,4 @@
 African-American
-школа дом
 transportation
 transformation
 responsibility
@@ -334,6 +333,7 @@ adjustment
 additional
 accomplish
 absolutely
+школа дом
 yesterday
 wonderful
 volunteer
@@ -1315,6 +1315,7 @@ account
 absence
 ability
 abandon
+awfawef
 yellow
 writer
 worker
@@ -1806,6 +1807,7 @@ access
 accept
 absorb
 abroad
+qwasdf
 adqwd
 youth
 yours
@@ -2290,6 +2292,7 @@ actor
 abuse
 above
 about
+szsdf
 sdef
 csef
 zone
@@ -2794,6 +2797,7 @@ AIDS
 aide
 acid
 able
+gwer
 sde
 you
 yet
@@ -2968,6 +2972,7 @@ ago
 age
 add
 act
+awe
 se
 am
 we
@@ -3004,13 +3009,8 @@ as
 AM
 ah
 ad
+sd
 w
 i
 I
 a
-awfawef
-awe
-sd
-gwer
-szsdf
-qwasdf

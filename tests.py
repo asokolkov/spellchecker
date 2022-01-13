@@ -1,5 +1,6 @@
 import unittest
 from calculations import *
+from files import *
 
 strings = [
         ("Вертолет", "Вертолет"),
@@ -65,3 +66,31 @@ class TestCalculations(unittest.TestCase):
                 "1;ob234b 1ou3b4njo \n g-345t -g3w45 q34x,1.34"),
             ['1;ob234b', '1ou3b4njo', 'g-345t', '-g3w45', 'q34x,1.34'])
         self.assertEqual(text_to_array(""), [])
+
+    def test_get_best_word(self):
+        self.assertEqual(
+            get_best_word("уточнния", sorted(text_results[1], reverse=True),
+                          "Imported"),
+            "уточнения")
+        self.assertEqual(
+            get_best_word("уточнения", sorted(text_results[1], reverse=True),
+                          "Imported", except_word="уточнения"),
+            "обучения")
+        self.assertEqual(
+            get_best_word("уточнния", sorted(text_results[1], reverse=True),
+                          "Handmaid"),
+            "уточнения")
+        self.assertEqual(
+            get_best_word("уточнения", sorted(text_results[1], reverse=True),
+                          "Handmaid", except_word="уточнения"),
+            "обучения")
+
+    def test_read_file(self):
+        x = read_file("dictionary.txt")
+        self.assertEqual((x[50], x[27]), ('particularly', 'demonstration'))
+        self.assertEqual(read_file("d.txt"), None)
+        append_file("dictionary.txt", x)
+
+    def test_file_to_dict(self):
+        self.assertEqual(file_to_dict(),
+                         {'dict_name': 'dictionary.txt', 'method': 'Imported'})
