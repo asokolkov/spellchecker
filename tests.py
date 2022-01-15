@@ -64,8 +64,8 @@ class TestCalculations(unittest.TestCase):
         self.assertEqual(
             text_to_array(
                 "1;ob234b 1ou3b4njo \n g-345t -g3w45 q34x,1.34"),
-            ['1;ob234b', '1ou3b4njo', 'g-345t', '-g3w45', 'q34x,1.34'])
-        self.assertEqual(text_to_array(""), [])
+            ['ob234b', '1ou3b4njo', '', '', 'g-345t', '-g3w45', 'q34x'])
+        self.assertEqual(text_to_array(""), [""])
 
     def test_get_best_word(self):
         self.assertEqual(
