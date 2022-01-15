@@ -71,7 +71,7 @@ def get_clicked_word(x, y, text):
 
 def text_to_array(text):
     result = []
-    for i in re.split("[^a-zA-Z0-9-]", text):
+    for i in re.split("[^a-zA-Zа-яА-Я0-9-]", text):
         if not i.isdigit():
             result.append(i)
     return result
