@@ -42,6 +42,7 @@ def compress_coords(start, finish):
 
 
 def get_clicked_word(x, y, text):
+    pattern = re.compile("[a-zA-Zа-яА-Я0-9-]")
     result = ""
     clicked_coords = text.index(f"@{x},{y}"), text.index("current")
     text_coords = clicked_coords[0].split(".")
@@ -50,7 +51,7 @@ def get_clicked_word(x, y, text):
     finish = f"{row}.{col + 1}"
     letter = text.get(f"{row}.{col}", finish)
     i = 1
-    while letter.isalpha() or letter == "-":
+    while pattern.match(letter):
         result += letter
         i += 1
         finish = f"{row}.{col + i}"
@@ -59,7 +60,7 @@ def get_clicked_word(x, y, text):
     i = 1
     start = f"{row}.{col - 1}"
     letter = text.get(start, f"{row}.{col}")
-    while letter.isalpha() or letter == "-":
+    while pattern.match(letter):
         result = letter + result
         i += 1
         start = f"{row}.{col - i}"
@@ -70,9 +71,8 @@ def get_clicked_word(x, y, text):
 
 def text_to_array(text):
     result = []
-    for i in text.split():
-        if not i.isdigit() and (bool(re.search("[а-яА-Я-]", i))
-                                or bool(re.search("[a-zA-Z-]", i))):
+    for i in re.split("[^a-zA-Z0-9-]", text):
+        if not i.isdigit():
             result.append(i)
     return result
 

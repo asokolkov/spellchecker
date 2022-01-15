@@ -8,7 +8,7 @@ from calculations import get_best_word, text_to_array, get_coords, \
     get_clicked_word
 
 
-def highlight():
+def highlight(words, text, correct_words):
     words.coords = ()
     words.wrong = []
     text.tag_remove("wrong", "1.0", tk.END)
@@ -21,7 +21,7 @@ def highlight():
         local_text = local_text.replace(i, "#" * len(i), 1)
 
 
-def on_word_click(event):
+def on_word_click(event, words, correct_words, text, top_btn, bot_btn):
     word, coords = get_clicked_word(event.x, event.y, text)
     word = word.lower()
     if word in words.wrong:
@@ -32,17 +32,17 @@ def on_word_click(event):
         words.coords = coords
 
 
-def replace_word(button):
-    if button["text"] != "":
+def replace_word(main_btn, other_btn, words, text):
+    if main_btn["text"] != "":
         start = words.coords[0]
         finish = words.coords[1]
         text.delete(start, finish)
-        text.insert(start, button["text"])
-        top_btn["text"] = ""
-        bot_btn["text"] = ""
+        text.insert(start, main_btn["text"])
+        main_btn["text"] = ""
+        other_btn["text"] = ""
 
 
-def on_mouse_move(event):
+def on_mouse_move(event, words, text):
     text.tag_remove("highlight", "1.0", tk.END)
     word, coords = get_clicked_word(event.x, event.y, text)
     if word.lower() in words.wrong:
@@ -55,8 +55,7 @@ class Words:
     coords: tuple
 
 
-if __name__ == "__main__":
-    main_data = file_to_dict()
+def main():
     filename = main_data["dict_name"]
     correct_words = read_file(filename)
 
@@ -71,12 +70,15 @@ if __name__ == "__main__":
 
     text = tk.Text(root, font=tkf.Font(size=30), foreground="#001219",
                    width=40, height=6)
-    top_btn = tk.Button(font=tkf.Font(size=30),
-                        command=lambda: replace_word(top_btn))
-    bot_btn = tk.Button(font=tkf.Font(size=30),
-                        command=lambda: replace_word(bot_btn))
-    ready_btn = tk.Button(text="Ready", font=tkf.Font(size=30, weight='bold'),
-                          command=highlight)
+    top_btn = tk.Button(
+        font=tkf.Font(size=30),
+        command=lambda: replace_word(top_btn, bot_btn, words, text))
+    bot_btn = tk.Button(
+        font=tkf.Font(size=30),
+        command=lambda: replace_word(bot_btn, top_btn, words, text))
+    ready_btn = tk.Button(
+        text="Ready", font=tkf.Font(size=30, weight='bold'),
+        command=lambda: highlight(words, text, correct_words))
 
     text.pack()
     top_btn.pack(fill="both")
@@ -86,8 +88,10 @@ if __name__ == "__main__":
     text.tag_config("highlight", background="#94d2bd")
     text.tag_configure("wrong", foreground="#ae2012")
 
-    text.bind("<Motion>", on_mouse_move)
-    text.bind("<Button>", on_word_click)
+    text.bind("<Motion>", lambda event: on_mouse_move(event, words, text))
+    text.bind(
+        "<Button>", lambda event: on_word_click(
+            event, words, correct_words, text, top_btn, bot_btn))
 
     main_menu = tk.Menu(root)
     root.config(menu=main_menu)
@@ -97,3 +101,11 @@ if __name__ == "__main__":
                           command=lambda: open_settings(root))
 
     root.mainloop()
+
+
+if __name__ == "__main__":
+    main_data = file_to_dict()
+    try:
+        main()
+    except Exception as e:
+        print(e)
